@@ -2,20 +2,46 @@
 <html lang="ro">
 <head>
     <meta charset="UTF-8">
-    <title>Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Proiect PIU</title>
+    <link rel="stylesheet" href="../css/style.css">
 </head>
 <body>
-    <h2>Dashboard</h2>
+    <nav class="navbar">
+        <div class="nav-container">
+            <h2 class="nav-logo">Proiect PIU</h2>
+            <button onclick="logout()" class="btn btn-secondary">Logout</button>
+        </div>
+    </nav>
 
-    <p id="welcome"></p>
+    <div class="container">
+        <div class="dashboard-header">
+            <h1 id="welcome">Bun venit!</h1>
+        </div>
 
-    <h3>Evenimentele mele</h3>
-    <ul id="eventsList">
-        <li>Fotbal - Parcul Central</li>
-        <li>Alergare - Faget</li>
-    </ul>
+        <div class="dashboard-content">
+            <div class="card">
+                <h2>Informații Cont</h2>
+                <div id="userInfo" class="user-info">
+                </div>
+            </div>
 
-    <button onclick="logout()">Logout</button>
+            <div class="card">
+                <h2>Evenimentele mele</h2>
+                <ul id="eventsList" class="events-list">
+                    <li class="event-item">
+                        <strong>Fotbal</strong> - Parcul Central
+                        <span class="event-date">15 Jan 2025</span>
+                    </li>
+                    <li class="event-item">
+                        <strong>Alergare</strong> - Făget
+                        <span class="event-date">18 Jan 2025</span>
+                    </li>
+                </ul>
+                <p class="empty-message">Nu există evenimente în acest moment.</p>
+            </div>
+        </div>
+    </div>
 
     <script src="../js/auth.js"></script>
 </body>

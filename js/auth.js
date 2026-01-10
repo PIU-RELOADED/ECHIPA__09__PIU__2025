@@ -1,39 +1,128 @@
-if (window.location.pathname.includes("dashboard.html")) {
-    const user = JSON.parse(localStorage.getItem("user"));
-    if (!user) {
-        window.location.href = "login.html";
-    } else {
-        document.getElementById("welcome").innerText =
-            "Bine ai venit, " + user.email;
+function isAuthenticated() {
+    return localStorage.getItem("isLoggedIn") === "true";
+}
+
+function getCurrentUserEmail() {
+    return localStorage.getItem("userEmail") || "";
+}
+
+function protectPage() {
+    const currentPath = window.location.pathname;
+    const currentPage = currentPath.split('/').pop();
+    const isLoginPage = currentPath.includes('login.html');
+    
+    if (!isLoginPage && (currentPage === 'dashboard.html' || currentPage === 'index.html' || currentPath.includes('dashboard') || currentPath.includes('index'))) {
+        if (!isAuthenticated()) {
+            const loginPath = currentPath.includes('pages/') ? 'login.html' : 'pages/login.html';
+            window.location.href = loginPath;
+            return false;
+        }
+    }
+    return true;
+}
+
+function redirectIfAuthenticated() {
+    const currentPath = window.location.pathname;
+    if (currentPath.includes('login.html')) {
+        if (isAuthenticated()) {
+            const dashboardPath = currentPath.includes('pages/') ? 'dashboard.html' : 'pages/dashboard.html';
+            window.location.href = dashboardPath;
+        }
     }
 }
 
-const form = document.getElementById("loginForm");
-if (form) {
-    form.addEventListener("submit", function (e) {
+(function() {
+    function init() {
+        if (!protectPage()) {
+            return;
+        }
+        redirectIfAuthenticated();
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+    } else {
+        init();
+    }
+})();
+
+const loginForm = document.getElementById("loginForm");
+if (loginForm) {
+    loginForm.addEventListener("submit", function (e) {
         e.preventDefault();
 
-        const email = document.getElementById("email").value;
+        const email = document.getElementById("email").value.trim();
         const password = document.getElementById("password").value;
 
+        const errorElement = document.getElementById("error");
+
         if (email === "" || password === "") {
-            document.getElementById("error").innerText =
-                "Completeaza toate campurile";
+            errorElement.innerText = "Completează toate câmpurile";
+            errorElement.style.display = "block";
             return;
         }
 
-        // simulare autentificare
-        const user = {
-            email: email
-        };
+        if (!validateEmail(email)) {
+            errorElement.innerText = "Introdu o adresă de email validă";
+            errorElement.style.display = "block";
+            return;
+        }
 
-        localStorage.setItem("user", JSON.stringify(user));
-        window.location.href = "dashboard.html";
+        if (password.length < 3) {
+            errorElement.innerText = "Parola trebuie să aibă minimum 3 caractere";
+            errorElement.style.display = "block";
+            return;
+        }
+
+        localStorage.setItem("isLoggedIn", "true");
+        localStorage.setItem("userEmail", email);
+        
+        const currentPath = window.location.pathname;
+        const dashboardPath = currentPath.includes('pages/') ? 'dashboard.html' : 'pages/dashboard.html';
+        window.location.href = dashboardPath;
     });
 }
 
-// logout
+function validateEmail(email) {
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return re.test(email);
+}
+
 function logout() {
-    localStorage.removeItem("user");
-    window.location.href = "login.html";
+    if (confirm("Ești sigur că vrei să te deloghezi?")) {
+        localStorage.removeItem("isLoggedIn");
+        localStorage.removeItem("userEmail");
+        const currentPath = window.location.pathname;
+        const loginPath = currentPath.includes('pages/') ? 'login.html' : 'pages/login.html';
+        window.location.href = loginPath;
+    }
+}
+
+function displayUserInfo() {
+    const email = getCurrentUserEmail();
+    const currentPath = window.location.pathname;
+    
+    if (email && (currentPath.includes("dashboard.html") || currentPath.includes("index.html"))) {
+        const welcomeElement = document.getElementById("welcome");
+        const userInfoElement = document.getElementById("userInfo");
+        
+        if (welcomeElement) {
+            const name = email.split('@')[0];
+            welcomeElement.innerText = `Bine ai venit, ${name}!`;
+        }
+        
+        if (userInfoElement) {
+            userInfoElement.innerHTML = `
+                <div class="info-item">
+                    <strong>Email:</strong> ${email}
+                </div>
+            `;
+        }
+    }
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', displayUserInfo);
+} else {
+    displayUserInfo();
 }
