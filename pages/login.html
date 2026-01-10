@@ -2,22 +2,35 @@
 <html lang="ro">
 <head>
     <meta charset="UTF-8">
-    <title>Login</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Autentificare - Proiect PIU</title>
+    <link rel="stylesheet" href="../css/style.css">
 </head>
 <body>
-    <h2>Autentificare</h2>
+    <div class="container">
+        <div class="login-card">
+            <h1>Autentificare</h1>
+            <p class="subtitle">Introdu datele tale pentru a continua</p>
 
-    <form id="loginForm">
-        <label>Email:</label><br>
-        <input type="email" id="email" required><br><br>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" placeholder="nume@exemplu.com" required>
+                </div>
 
-        <label>Parola:</label><br>
-        <input type="password" id="password" required><br><br>
+                <div class="form-group">
+                    <label for="password">Parolă</label>
+                    <input type="password" id="password" placeholder="Introdu parola" required>
+                </div>
 
-        <button type="submit">Login</button>
-    </form>
+                <div id="error" class="error-message"></div>
 
-    <p id="error" style="color:red;"></p>
+                <button type="submit" class="btn btn-primary">Conectează-te</button>
+            </form>
+
+            <p class="subtitle">Nu ai cont? <a href="register.html" class="register-link">Înregistrează-te aici</a></p>
+        </div>
+    </div>
 
     <script src="../js/auth.js"></script>
 </body>

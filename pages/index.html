@@ -1,1 +1,53 @@
- 
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acasa</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <h2 class="nav-logo">SportZone</h2>
+            <div>
+                <span id="userEmail" style="margin-right: 15px; color: var(--text-secondary);"></span>
+                <button onclick="logout()" class="btn btn-secondary">Logout</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="dashboard-header">
+            <h1>Pagina Principală</h1>
+            <p class="subtitle">Bine ai venit în aplicația SportZone</p>
+        </div>
+
+        <div class="card">
+            <h2>Despre SportZone</h2>
+            <p>Bun venit în aplicația de gestionare evenimente sportive SportZone. Această pagină este protejată și necesită autentificare.</p>
+            
+            <div style="margin-top: 20px;">
+                <a href="dashboard.html" class="btn btn-primary" style="text-decoration: none; display: inline-block; width: auto; padding: 12px 30px;">
+                    Vezi Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/auth.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof getCurrentUserEmail === 'function') {
+                const email = getCurrentUserEmail();
+                if (email) {
+                    const userEmailElement = document.getElementById('userEmail');
+                    if (userEmailElement) {
+                        userEmailElement.textContent = email;
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
