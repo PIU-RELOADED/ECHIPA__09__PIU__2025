@@ -1,0 +1,77 @@
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+}
+
+.form-grid .full-width {
+    grid-column: 1 / -1;
+}
+
+.required {
+    color: var(--danger-color);
+    margin-left: 4px;
+}
+
+.helper-text {
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    margin-top: 6px;
+}
+
+select,
+textarea {
+    width: 100%;
+    padding: 12px 15px;
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: border-color 0.3s, box-shadow 0.3s;
+    background-color: var(--card-background);
+    font-family: inherit;
+}
+
+select:focus,
+textarea:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+}
+
+textarea {
+    min-height: 120px;
+    resize: vertical;
+}
+
+.field-error {
+    color: var(--danger-color);
+    font-size: 0.85rem;
+    margin-top: 6px;
+    min-height: 18px;
+}
+
+.success-message {
+    color: var(--success-color);
+    background-color: #d4edda;
+    border: 1px solid #c3e6cb;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    display: none;
+    font-size: 0.9rem;
+}
+
+.events-card {
+    margin-top: 20px;
+}
+
+.event-meta {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+@media (max-width: 900px) {
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+}

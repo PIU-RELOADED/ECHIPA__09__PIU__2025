@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Creare Eveniment Sportiv</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/create-event.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <h2 class="nav-logo">SportZone</h2>
+            <div>
+                <a href="dashboard.html" class="btn btn-secondary" style="text-decoration: none; margin-right: 10px;">
+                    Dashboard
+                </a>
+                <button onclick="logout()" class="btn btn-secondary">Logout</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="dashboard-header">
+            <h1>Creare eveniment sportiv</h1>
+            <p class="subtitle">Completeaza formularul pentru a publica un eveniment nou.</p>
+        </div>
+
+        <div class="card">
+            <h2>Detalii eveniment</h2>
+            <div id="errorSummary" class="error-message"></div>
+            <div id="successMessage" class="success-message"></div>
+
+            <form id="eventForm" novalidate>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="sportType">Tip de sport<span class="required">*</span></label>
+                        <select id="sportType" name="sportType" required></select>
+                        <div id="error-sportType" class="field-error"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="eventDate">Data desfasurarii<span class="required">*</span></label>
+                        <input type="date" id="eventDate" name="eventDate" required>
+                        <div id="error-eventDate" class="field-error"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="eventTime">Ora desfasurarii<span class="required">*</span></label>
+                        <input type="time" id="eventTime" name="eventTime" required>
+                        <div id="error-eventTime" class="field-error"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="eventLocation">Locatie (Cluj-Napoca)<span class="required">*</span></label>
+                        <select id="eventLocation" name="eventLocation" required></select>
+                        <div class="helper-text">Lista include locatii populare din oras.</div>
+                        <div id="error-eventLocation" class="field-error"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="maxParticipants">Numar maxim de participanti<span class="required">*</span></label>
+                        <input type="number" id="maxParticipants" name="maxParticipants" min="2" max="200" required>
+                        <div id="error-maxParticipants" class="field-error"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="performanceLevel">Nivel minim de performanta<span class="required">*</span></label>
+                        <select id="performanceLevel" name="performanceLevel" required></select>
+                        <div id="error-performanceLevel" class="field-error"></div>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label for="equipment">Dotari necesare<span class="required">*</span></label>
+                        <textarea id="equipment" name="equipment" placeholder="Ex: mingi, veste, cronometru" required></textarea>
+                        <div id="error-equipment" class="field-error"></div>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label for="description">Descriere eveniment<span class="required">*</span></label>
+                        <textarea id="description" name="description" placeholder="Descrie pe scurt evenimentul." required></textarea>
+                        <div id="error-description" class="field-error"></div>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Creeaza eveniment</button>
+            </form>
+        </div>
+
+        <div class="card events-card">
+            <h2>Evenimente create recent</h2>
+            <ul id="createdEventsList" class="events-list"></ul>
+            <p id="eventsEmpty" class="empty-message">Nu ai inca evenimente create.</p>
+        </div>
+    </div>
+
+    <script src="../js/auth.js"></script>
+    <script src="../js/create-event.js"></script>
+</body>
+</html>
