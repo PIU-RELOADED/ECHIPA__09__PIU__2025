@@ -1,0 +1,32 @@
+{
+    "sports": [
+        "Fotbal",
+        "Baschet",
+        "Tenis",
+        "Alergare",
+        "Ciclism",
+        "Inot",
+        "Volei",
+        "Handbal",
+        "Fitness",
+        "Yoga"
+    ],
+    "locations": [
+        "Parcul Central",
+        "Parcul Iuliu Hatieganu",
+        "Baza Sportiva Gheorgheni",
+        "Cluj Arena",
+        "Parcul Rozelor",
+        "Parcul Feroviarilor",
+        "Faget",
+        "Lacul Chios",
+        "BT Arena",
+        "Parcul Detunata"
+    ],
+    "performanceLevels": [
+        "Incepator",
+        "Intermediar",
+        "Avansat",
+        "Competitional"
+    ]
+}
