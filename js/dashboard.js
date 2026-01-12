@@ -36,14 +36,19 @@ function renderEvents(eventsToDisplay) {
     eventsContainer.innerHTML = "";
     
     if (eventsToDisplay.length === 0) {
-        noResults.style.display = "block";
+        if (noResults) {
+            noResults.style.display = "block";
+        }
         return;
     }
 
-    noResults.style.display = "none";
+    if (noResults) {
+        noResults.style.display = "none";
+    }
     eventsToDisplay.forEach(event => {
         const card = document.createElement("div");
         card.className = "event-card";
+        card.style.cursor = "pointer";
         card.innerHTML = `
             <span class="badge">${event.performanceLevel}</span>
             <h3>${event.sportType}</h3>
@@ -56,7 +61,13 @@ function renderEvents(eventsToDisplay) {
             <p style="margin-top:10px; font-style:italic; font-size:0.85rem;">
                 ${event.description.substring(0, 100)}${event.description.length > 100 ? '...' : ''}
             </p>
+            <p style="margin-top:15px; color: var(--primary-color); font-weight: 600;">
+                Clic pentru detalii →
+            </p>
         `;
+        card.addEventListener('click', () => {
+            window.location.href = `event-detail.html?id=${event.id}`;
+        });
         eventsContainer.appendChild(card);
     });
 }

@@ -77,10 +77,18 @@
         </div>
 
         <div id="eventsContainer" class="events-grid">
-            </div>
-        <p id="noResults" class="empty-message" style="text-align: center; margin-top: 40px;">
-            Nu am găsit evenimente care să corespundă criteriilor tale.
-        </p>
+        </div>
+        <div id="noResults" class="empty-state" style="text-align: center; margin-top: 40px; display: none;">
+            <p style="font-size: 1.2rem; color: var(--text-secondary); margin-bottom: 20px;">
+                📭 Nu am găsit evenimente care să corespundă criteriilor tale.
+            </p>
+            <p style="color: var(--text-secondary); margin-bottom: 20px;">
+                Încearcă să modifici filtrele sau creează un nouă eveniment!
+            </p>
+            <a href="create-event.html" class="btn btn-primary" style="text-decoration: none; display: inline-block; width: auto; padding: 12px 30px;">
+                ➕ Crează Eveniment Nou
+            </a>
+        </div>
     </div>
 
     <script src="../js/auth.js"></script>
