@@ -10,8 +10,9 @@ function protectPage() {
     const currentPath = window.location.pathname;
     const currentPage = currentPath.split('/').pop();
     const isLoginPage = currentPath.includes('login.html');
+    const protectedPages = ['dashboard.html', 'index.html', 'event-detail.html', 'create-event.html'];
     
-    if (!isLoginPage && (currentPage === 'dashboard.html' || currentPage === 'index.html' || currentPath.includes('dashboard') || currentPath.includes('index'))) {
+    if (!isLoginPage && protectedPages.some(page => currentPath.includes(page))) {
         if (!isAuthenticated()) {
             const loginPath = currentPath.includes('pages/') ? 'login.html' : 'pages/login.html';
             window.location.href = loginPath;

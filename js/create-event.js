@@ -98,6 +98,10 @@ function saveEvent(eventData) {
     const events = getEvents();
     events.unshift(eventData);
     localStorage.setItem("events", JSON.stringify(events));
+    
+    // Save organizer information
+    const currentUserEmail = localStorage.getItem("userEmail");
+    localStorage.setItem(`organizer_${eventData.id}`, currentUserEmail);
 }
 
 function renderEvents() {

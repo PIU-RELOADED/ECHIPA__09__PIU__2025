@@ -19,21 +19,46 @@
 
     <div class="container">
         <div class="dashboard-header">
-            <h1>Pagina Principală</h1>
-            <p class="subtitle">Bine ai venit în aplicația SportZone</p>
+            <h1>🏟️ Bun venit pe SportZone!</h1>
+            <p class="subtitle">Platforma ta pentru organizarea și participarea la evenimente sportive</p>
         </div>
 
-        <div class="card">
-            <h2>Despre SportZone</h2>
-            <p>Bun venit în aplicația de gestionare evenimente sportive SportZone. Această pagină este protejată și necesită autentificare.</p>
-            
-            <div style="margin-top: 20px;">
-                <a href="dashboard.html" class="btn btn-primary" style="text-decoration: none; display: inline-block; width: auto; padding: 12px 30px;">
-                    Vezi Dashboard
+        <div class="dashboard-content">
+            <div class="card">
+                <h2>📋 Dashboard</h2>
+                <p>Explorează toate evenimentele sportive disponibile din Cluj-Napoca. Poți filtra după sport, nivel de performanță, dată și multe altele.</p>
+                <a href="dashboard.html" class="btn btn-primary" style="text-decoration: none; display: inline-block; width: auto; padding: 12px 30px; margin-top: 15px;">
+                    Mergi la Dashboard →
                 </a>
+            </div>
+
+            <div class="card">
+                <h2>➕ Crează Eveniment</h2>
+                <p>Ești organizator? Creează un nou eveniment sportiv și invită alții să se alăture ție. Stabilește locația, data, nivelul și alte detalii importante.</p>
+                <a href="create-event.html" class="btn btn-primary" style="text-decoration: none; display: inline-block; width: auto; padding: 12px 30px; margin-top: 15px;">
+                    Crează Eveniment →
+                </a>
+            </div>
+
+            <div class="card">
+                <h2>👤 Profilul Tău</h2>
+                <p>Ești conectat ca: <strong id="userProfileEmail"></strong></p>
+                <button onclick="logout()" class="btn btn-secondary" style="margin-top: 15px;">
+                    Deloghează-te
+                </button>
             </div>
         </div>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const email = localStorage.getItem('userEmail');
+            const userProfileEmail = document.getElementById('userProfileEmail');
+            if (email && userProfileEmail) {
+                userProfileEmail.textContent = email;
+            }
+        });
+    </script>
 
     <script src="../js/auth.js"></script>
     <script>
