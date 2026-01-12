@@ -10,9 +10,10 @@ function protectPage() {
     const currentPath = window.location.pathname;
     const currentPage = currentPath.split('/').pop();
     const isLoginPage = currentPath.includes('login.html');
+    const isRegisterPage = currentPath.includes('register.html');
     const protectedPages = ['dashboard.html', 'index.html', 'event-detail.html', 'create-event.html'];
     
-    if (!isLoginPage && protectedPages.some(page => currentPath.includes(page))) {
+    if (!isLoginPage && !isRegisterPage && protectedPages.some(page => currentPath.includes(page))) {
         if (!isAuthenticated()) {
             const loginPath = currentPath.includes('pages/') ? 'login.html' : 'pages/login.html';
             window.location.href = loginPath;
@@ -24,7 +25,7 @@ function protectPage() {
 
 function redirectIfAuthenticated() {
     const currentPath = window.location.pathname;
-    if (currentPath.includes('login.html')) {
+    if (currentPath.includes('login.html') || currentPath.includes('register.html')) {
         if (isAuthenticated()) {
             const dashboardPath = currentPath.includes('pages/') ? 'dashboard.html' : 'pages/dashboard.html';
             window.location.href = dashboardPath;
@@ -46,6 +47,15 @@ function redirectIfAuthenticated() {
         init();
     }
 })();
+
+function getUsers() {
+    const raw = localStorage.getItem("users");
+    return raw ? JSON.parse(raw) : [];
+}
+
+function saveUsers(users) {
+    localStorage.setItem("users", JSON.stringify(users));
+}
 
 const loginForm = document.getElementById("loginForm");
 if (loginForm) {
@@ -73,6 +83,21 @@ if (loginForm) {
             errorElement.innerText = "Parola trebuie să aibă minimum 3 caractere";
             errorElement.style.display = "block";
             return;
+        }
+
+        const users = getUsers();
+        if (users.length > 0) {
+            const user = users.find(u => u.email === email);
+            if (!user) {
+                errorElement.innerText = "Email sau parolă incorectă";
+                errorElement.style.display = "block";
+                return;
+            }
+            if (user.password !== password) {
+                errorElement.innerText = "Email sau parolă incorectă";
+                errorElement.style.display = "block";
+                return;
+            }
         }
 
         localStorage.setItem("isLoggedIn", "true");
@@ -127,3 +152,74 @@ if (document.readyState === 'loading') {
 } else {
     displayUserInfo();
 }
+
+const registerForm = document.getElementById("registerForm");
+if (registerForm) {
+    registerForm.addEventListener("submit", function (e) {
+        e.preventDefault();
+
+        const email = document.getElementById("regEmail").value.trim();
+        const password = document.getElementById("regPassword").value;
+        const passwordConfirm = document.getElementById("regPasswordConfirm").value;
+        const name = document.getElementById("regName").value.trim();
+
+        const errorElement = document.getElementById("error");
+        const successElement = document.getElementById("success");
+
+        errorElement.style.display = "none";
+        successElement.style.display = "none";
+
+        if (email === "" || password === "" || passwordConfirm === "" || name === "") {
+            errorElement.innerText = "Completează toate câmpurile";
+            errorElement.style.display = "block";
+            return;
+        }
+
+        if (!validateEmail(email)) {
+            errorElement.innerText = "Introdu o adresă de email validă";
+            errorElement.style.display = "block";
+            return;
+        }
+
+        if (password.length < 3) {
+            errorElement.innerText = "Parola trebuie să aibă minimum 3 caractere";
+            errorElement.style.display = "block";
+            return;
+        }
+
+        if (password !== passwordConfirm) {
+            errorElement.innerText = "Parolele nu coincid";
+            errorElement.style.display = "block";
+            return;
+        }
+
+        const users = getUsers();
+        if (users.find(u => u.email === email)) {
+            errorElement.innerText = "Un cont cu acest email există deja";
+            errorElement.style.display = "block";
+            return;
+        }
+
+        const newUser = {
+            email: email,
+            password: password,
+            name: name,
+            createdAt: new Date().toISOString()
+        };
+        users.push(newUser);
+        saveUsers(users);
+
+        localStorage.setItem("isLoggedIn", "true");
+        localStorage.setItem("userEmail", email);
+        
+        successElement.innerText = "Cont creat cu succes! Redirecționare...";
+        successElement.style.display = "block";
+        
+        setTimeout(() => {
+            const currentPath = window.location.pathname;
+            const dashboardPath = currentPath.includes('pages/') ? 'dashboard.html' : 'pages/dashboard.html';
+            window.location.href = dashboardPath;
+        }, 1500);
+    });
+}
+

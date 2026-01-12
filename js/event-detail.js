@@ -1,10 +1,8 @@
-// Get event ID from URL query parameter
 function getEventIdFromURL() {
     const params = new URLSearchParams(window.location.search);
     return params.get('id');
 }
 
-// Get event from localStorage by ID
 function getEventById(eventId) {
     const events = localStorage.getItem('events');
     if (!events) return null;
@@ -18,7 +16,6 @@ function getEventById(eventId) {
     }
 }
 
-// Get all participants for an event
 function getParticipants(eventId) {
     const participants = localStorage.getItem(`participants_${eventId}`);
     if (!participants) return [];
@@ -31,10 +28,7 @@ function getParticipants(eventId) {
     }
 }
 
-// Get organizer of the event
 function getEventOrganizer(event) {
-    // Presupunem că organizatorul este utilizatorul curent la crearea evenimentului
-    // Putem stoca aceasta informație in localStorage
     const organizerId = localStorage.getItem(`organizer_${event.id}`);
     if (!organizerId) {
         return 'Organizator necunoscut';
@@ -42,21 +36,18 @@ function getEventOrganizer(event) {
     return organizerId;
 }
 
-// Check if current user is organizer
 function isCurrentUserOrganizer(event) {
     const currentUserEmail = localStorage.getItem('userEmail');
     const organizerEmail = localStorage.getItem(`organizer_${event.id}`);
     return currentUserEmail === organizerEmail;
 }
 
-// Check if current user is already a participant
 function isUserParticipant(eventId) {
     const currentUserEmail = localStorage.getItem('userEmail');
     const participants = getParticipants(eventId);
     return participants.some(p => p.email === currentUserEmail);
 }
 
-// Add current user as participant
 function addParticipant(eventId) {
     const currentUserEmail = localStorage.getItem('userEmail');
     if (!currentUserEmail) {
@@ -64,13 +55,11 @@ function addParticipant(eventId) {
         return false;
     }
 
-    // Check if already participating
     if (isUserParticipant(eventId)) {
         showError('Ești deja înscris la acest eveniment!');
         return false;
     }
 
-    // Get event to check available spots
     const event = getEventById(eventId);
     if (!event) {
         showError('Evenimentul nu a fost găsit.');
@@ -79,13 +68,11 @@ function addParticipant(eventId) {
 
     const participants = getParticipants(eventId);
     
-    // Check max participants
     if (participants.length >= event.maxParticipants) {
         showError('Nu mai sunt locuri disponibile pentru acest eveniment!');
         return false;
     }
 
-    // Add participant
     const newParticipant = {
         email: currentUserEmail,
         joinedAt: new Date().toISOString(),
@@ -95,10 +82,18 @@ function addParticipant(eventId) {
     participants.push(newParticipant);
     localStorage.setItem(`participants_${eventId}`, JSON.stringify(participants));
 
+    const organizerEmail = getEventOrganizer(event);
+    if (organizerEmail && organizerEmail !== currentUserEmail && typeof addNotification === 'function') {
+        addNotification(
+            `${currentUserEmail.split('@')[0]} s-a înscris la evenimentul tău "${event.sportType}"`,
+            'info',
+            `event-detail.html?id=${eventId}`
+        );
+    }
+
     return true;
 }
 
-// Remove current user from participants
 function removeParticipant(eventId) {
     const currentUserEmail = localStorage.getItem('userEmail');
     const participants = getParticipants(eventId);
@@ -109,13 +104,11 @@ function removeParticipant(eventId) {
     return true;
 }
 
-// Calculate available spots
 function getAvailableSpots(event) {
     const participants = getParticipants(event.id);
     return Math.max(0, event.maxParticipants - participants.length);
 }
 
-// Render event details
 function renderEventDetails() {
     const eventId = getEventIdFromURL();
     
@@ -204,6 +197,14 @@ function renderEventDetails() {
                 ` : `
                     <p class="organizer-info-text">Tu organizezi acest eveniment</p>
                 `}
+                <div style="margin-top: 15px;">
+                    <button id="interestBtn" class="btn ${isUserInterested(event.id) ? 'btn-primary' : 'btn-secondary'}" style="margin-right: 10px;">
+                        ${isUserInterested(event.id) ? '❤️ Interesat' : '🤍 Marchează Interes'}
+                    </button>
+                    <span style="color: var(--text-secondary); font-size: 0.9rem;">
+                        ${getInterestedCount(event.id)} persoane interesate
+                    </span>
+                </div>
             </div>
 
             <div class="participants-section">
@@ -224,23 +225,48 @@ function renderEventDetails() {
                     <p class="empty-message">Niciun participant încă. Fii primul!</p>
                 `}
             </div>
+
+            <div class="comments-section">
+                <h3>💬 Comentarii</h3>
+                <div class="add-comment-form">
+                    <textarea id="commentText" placeholder="Scrie un comentariu..." rows="3"></textarea>
+                    <button id="submitCommentBtn" class="btn btn-primary">Postează Comentariu</button>
+                </div>
+                <div id="commentsList" class="comments-list">
+                    ${renderComments(event.id)}
+                </div>
+            </div>
         </div>
     `;
 
-    // Add event listener to participate button
     const participateBtn = document.getElementById('participateBtn');
     if (participateBtn) {
         participateBtn.addEventListener('click', handleParticipateClick);
     }
+
+    const submitCommentBtn = document.getElementById('submitCommentBtn');
+    if (submitCommentBtn) {
+        submitCommentBtn.addEventListener('click', handleAddComment);
+    }
+
+    const interestBtn = document.getElementById('interestBtn');
+    if (interestBtn) {
+        interestBtn.addEventListener('click', handleInterestToggle);
+    }
+
+    document.querySelectorAll('.delete-comment-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const commentId = this.getAttribute('data-comment-id');
+            deleteComment(event.id, commentId);
+        });
+    });
 }
 
-// Handle participate button click
 function handleParticipateClick() {
     const eventId = getEventIdFromURL();
     const isParticipant = isUserParticipant(eventId);
 
     if (isParticipant) {
-        // Remove participant
         if (confirm('Ești sigur că vrei să te retragi din acest eveniment?')) {
             removeParticipant(eventId);
             showSuccess('Ai fost retras din eveniment!');
@@ -249,7 +275,6 @@ function handleParticipateClick() {
             }, 1000);
         }
     } else {
-        // Add participant
         if (addParticipant(eventId)) {
             showSuccess('Înscrierea ta la eveniment a fost confirmată!');
             setTimeout(() => {
@@ -259,20 +284,17 @@ function handleParticipateClick() {
     }
 }
 
-// Format date to readable format
 function formatDate(dateString) {
     const date = new Date(dateString + 'T00:00:00');
     const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
     return date.toLocaleDateString('ro-RO', options);
 }
 
-// Format date and time
 function formatDateTime(isoString) {
     const date = new Date(isoString);
     return date.toLocaleDateString('ro-RO') + ' ' + date.toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' });
 }
 
-// Show error message
 function showError(message) {
     const errorMsg = document.getElementById('errorMessage');
     if (errorMsg) {
@@ -284,7 +306,6 @@ function showError(message) {
     }
 }
 
-// Show success message
 function showSuccess(message) {
     const container = document.getElementById('eventDetailContainer');
     const successDiv = document.createElement('div');
@@ -299,7 +320,189 @@ function showSuccess(message) {
     }, 3000);
 }
 
-// Initialize on page load
+function getComments(eventId) {
+    const raw = localStorage.getItem(`comments_${eventId}`);
+    return raw ? JSON.parse(raw) : [];
+}
+
+function saveComments(eventId, comments) {
+    localStorage.setItem(`comments_${eventId}`, JSON.stringify(comments));
+}
+
+function addComment(eventId, text) {
+    const currentUserEmail = localStorage.getItem('userEmail');
+    if (!currentUserEmail) {
+        showError('Trebuie să fii autentificat pentru a comenta.');
+        return false;
+    }
+
+    if (!text || text.trim().length < 3) {
+        showError('Comentariul trebuie să aibă cel puțin 3 caractere.');
+        return false;
+    }
+
+    const comments = getComments(eventId);
+    const newComment = {
+        id: `comment_${Date.now()}`,
+        eventId: eventId,
+        authorEmail: currentUserEmail,
+        authorName: currentUserEmail.split('@')[0],
+        text: text.trim(),
+        createdAt: new Date().toISOString()
+    };
+
+    comments.push(newComment);
+    saveComments(eventId, comments);
+
+    const event = getEventById(eventId);
+    if (event) {
+        const organizerEmail = getEventOrganizer(event);
+        if (organizerEmail && organizerEmail !== currentUserEmail && typeof addNotification === 'function') {
+            addNotification(
+                `${currentUserEmail.split('@')[0]} a comentat la evenimentul tău "${event.sportType}"`,
+                'info',
+                `event-detail.html?id=${eventId}`
+            );
+        }
+    }
+
+    return true;
+}
+
+function deleteComment(eventId, commentId) {
+    const currentUserEmail = localStorage.getItem('userEmail');
+    const comments = getComments(eventId);
+    const comment = comments.find(c => c.id === commentId);
+
+    if (!comment) return false;
+
+    if (comment.authorEmail !== currentUserEmail) {
+        showError('Poți șterge doar propriile comentarii.');
+        return false;
+    }
+
+    if (!confirm('Ești sigur că vrei să ștergi acest comentariu?')) {
+        return false;
+    }
+
+    const updatedComments = comments.filter(c => c.id !== commentId);
+    saveComments(eventId, updatedComments);
+    return true;
+}
+
+function renderComments(eventId) {
+    const comments = getComments(eventId);
+    const currentUserEmail = localStorage.getItem('userEmail');
+
+    if (comments.length === 0) {
+        return '<p class="empty-message">Niciun comentariu încă. Fii primul care comentează!</p>';
+    }
+
+    const sortedComments = [...comments].sort((a, b) => {
+        return new Date(b.createdAt) - new Date(a.createdAt);
+    });
+
+    return `
+        <div class="comments-container">
+            ${sortedComments.map(comment => `
+                <div class="comment-item">
+                    <div>
+                        <div>
+                            <p>${escapeHtml(comment.authorName)}</p>
+                            <p>${formatDateTime(comment.createdAt)}</p>
+                        </div>
+                        ${comment.authorEmail === currentUserEmail ? `
+                            <button class="delete-comment-btn btn btn-danger" data-comment-id="${comment.id}">
+                                Șterge
+                            </button>
+                        ` : ''}
+                    </div>
+                    <p>${escapeHtml(comment.text)}</p>
+                </div>
+            `).join('')}
+        </div>
+    `;
+}
+
+function handleAddComment() {
+    const eventId = getEventIdFromURL();
+    const commentTextarea = document.getElementById('commentText');
+    
+    if (!commentTextarea) return;
+
+    const text = commentTextarea.value.trim();
+    
+    if (addComment(eventId, text)) {
+        showSuccess('Comentariul a fost adăugat!');
+        commentTextarea.value = '';
+        setTimeout(() => {
+            renderEventDetails();
+        }, 500);
+    }
+}
+
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+function getInterestedUsers(eventId) {
+    const raw = localStorage.getItem(`interested_${eventId}`);
+    return raw ? JSON.parse(raw) : [];
+}
+
+function saveInterestedUsers(eventId, users) {
+    localStorage.setItem(`interested_${eventId}`, JSON.stringify(users));
+}
+
+function isUserInterested(eventId) {
+    const currentUserEmail = localStorage.getItem('userEmail');
+    if (!currentUserEmail) return false;
+    
+    const interestedUsers = getInterestedUsers(eventId);
+    return interestedUsers.some(u => u.email === currentUserEmail);
+}
+
+function getInterestedCount(eventId) {
+    return getInterestedUsers(eventId).length;
+}
+
+function toggleInterest(eventId) {
+    const currentUserEmail = localStorage.getItem('userEmail');
+    if (!currentUserEmail) {
+        showError('Trebuie să fii autentificat pentru a marca interesul.');
+        return false;
+    }
+
+    const interestedUsers = getInterestedUsers(eventId);
+    const userIndex = interestedUsers.findIndex(u => u.email === currentUserEmail);
+
+    if (userIndex > -1) {
+        interestedUsers.splice(userIndex, 1);
+    } else {
+        interestedUsers.push({
+            email: currentUserEmail,
+            name: currentUserEmail.split('@')[0],
+            interestedAt: new Date().toISOString()
+        });
+    }
+
+    saveInterestedUsers(eventId, interestedUsers);
+    return true;
+}
+
+function handleInterestToggle() {
+    const eventId = getEventIdFromURL();
+    if (toggleInterest(eventId)) {
+        const wasInterested = isUserInterested(eventId);
+        showSuccess(wasInterested ? 'Ai marcat interesul față de acest eveniment!' : 'Ai eliminat interesul față de acest eveniment.');
+        setTimeout(() => {
+            renderEventDetails();
+        }, 500);
+    }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     renderEventDetails();
 });

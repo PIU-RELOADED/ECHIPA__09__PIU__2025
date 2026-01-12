@@ -99,7 +99,6 @@ function saveEvent(eventData) {
     events.unshift(eventData);
     localStorage.setItem("events", JSON.stringify(events));
     
-    // Save organizer information
     const currentUserEmail = localStorage.getItem("userEmail");
     localStorage.setItem(`organizer_${eventData.id}`, currentUserEmail);
 }
@@ -224,6 +223,15 @@ if (form) {
         saveEvent(eventData);
         successMessage.textContent = "Evenimentul a fost salvat.";
         successMessage.style.display = "block";
+        
+        if (typeof addNotification === 'function') {
+            addNotification(
+                `Ai creat cu succes evenimentul "${eventData.sportType}"`,
+                'success',
+                `event-detail.html?id=${eventData.id}`
+            );
+        }
+        
         form.reset();
         setMinDate();
         renderEvents();
