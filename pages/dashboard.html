@@ -37,16 +37,62 @@
             margin-bottom: 10px;
         }
         .event-details p { font-size: 0.9rem; margin-bottom: 5px; }
+        .tab-btn {
+            padding: 12px 20px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            font-size: 1rem;
+            color: var(--text-secondary);
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+        .tab-btn:hover {
+            color: var(--primary-color);
+        }
+        .tab-btn.active {
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
+            font-weight: 600;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .empty-state {
+            padding: 40px 20px;
+        }
+        .event-card .cancel-btn {
+            margin-top: 10px;
+            padding: 8px 16px;
+            font-size: 0.9rem;
+        }
     </style>
 </head>
 <body>
     <nav class="navbar">
         <div class="nav-container">
             <h2 class="nav-logo">SportZone</h2>
-            <div>
-                <a href="create-event.html" class="btn btn-primary" style="text-decoration: none; display: inline-block; width: auto; margin-right: 10px;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <a href="create-event.html" class="btn btn-primary" style="text-decoration: none; display: inline-block; width: auto;">
                     + Creează Eveniment
                 </a>
+                <div style="position: relative;">
+                    <button id="notificationButton" onclick="toggleNotificationDropdown()" class="btn btn-secondary" style="position: relative; padding: 8px 12px;">
+                        🔔 Notificări
+                        <span id="notificationBadge" style="display: none; position: absolute; top: -5px; right: -5px; background: var(--danger-color); color: white; border-radius: 50%; width: 20px; height: 20px; font-size: 0.7rem; display: flex; align-items: center; justify-content: center; font-weight: bold;">0</span>
+                    </button>
+                    <div id="notificationDropdown" style="display: none; position: absolute; top: 100%; right: 0; margin-top: 10px; background: white; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); min-width: 300px; max-width: 400px; z-index: 1000; border: 1px solid var(--border-color);">
+                        <div style="padding: 15px; border-bottom: 1px solid var(--border-color); font-weight: 600;">
+                            Notificări
+                        </div>
+                        <div style="padding: 20px; text-align: center; color: var(--text-secondary);">
+                            <p>Se încarcă...</p>
+                        </div>
+                    </div>
+                </div>
                 <button onclick="logout()" class="btn btn-secondary">Logout</button>
             </div>
         </div>
@@ -55,43 +101,102 @@
     <div class="container">
         <div class="dashboard-header">
             <h1 id="welcome">Bun venit!</h1>
-            <p class="subtitle">Explorează și filtrează evenimentele sportive disponibile.</p>
+            <p class="subtitle">Gestionează evenimentele tale și explorează altele disponibile.</p>
         </div>
 
-        <div class="card filter-section">
-            <h3>Filtrează Evenimente</h3>
-            <div class="filter-grid">
-                <input type="text" id="searchName" placeholder="Caută după sport...">
-                <select id="filterSport">
-                    <option value="">Toate sporturile</option>
-                </select>
-                <select id="filterLevel">
-                    <option value="">Toate nivelurile</option>
-                </select>
-                <input type="date" id="filterDate">
-                <select id="sortEvents">
-                    <option value="dateAsc">Dată (curând)</option>
-                    <option value="dateDesc">Dată (îndepărtat)</option>
-                </select>
+        <!-- Tabs pentru navigare între secțiuni -->
+        <div class="card" style="margin-bottom: 20px;">
+            <div style="display: flex; gap: 10px; border-bottom: 2px solid var(--border-color);">
+                <button class="tab-btn active" data-tab="all">Toate Evenimentele</button>
+                <button class="tab-btn" data-tab="organized">Evenimente Organizate</button>
+                <button class="tab-btn" data-tab="participating">Evenimente la Care Particip</button>
+                <button class="tab-btn" data-tab="history">Istoric</button>
             </div>
         </div>
 
-        <div id="eventsContainer" class="events-grid">
+        <!-- Secțiunea Toate Evenimentele -->
+        <div id="tab-all" class="tab-content active">
+            <div class="card filter-section">
+                <h3>Filtrează Evenimente</h3>
+                <div class="filter-grid">
+                    <input type="text" id="searchName" placeholder="Caută după sport...">
+                    <select id="filterSport">
+                        <option value="">Toate sporturile</option>
+                    </select>
+                    <select id="filterLevel">
+                        <option value="">Toate nivelurile</option>
+                    </select>
+                    <input type="date" id="filterDate">
+                    <select id="sortEvents">
+                        <option value="dateAsc">Dată (curând)</option>
+                        <option value="dateDesc">Dată (îndepărtat)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div id="eventsContainer" class="events-grid">
+            </div>
+            <div id="noResults" class="empty-state" style="text-align: center; margin-top: 40px; display: none;">
+                <p style="font-size: 1.2rem; color: var(--text-secondary); margin-bottom: 20px;">
+                    📭 Nu am găsit evenimente care să corespundă criteriilor tale.
+                </p>
+                <p style="color: var(--text-secondary); margin-bottom: 20px;">
+                    Încearcă să modifici filtrele sau creează un nouă eveniment!
+                </p>
+                <a href="create-event.html" class="btn btn-primary" style="text-decoration: none; display: inline-block; width: auto; padding: 12px 30px;">
+                    ➕ Crează Eveniment Nou
+                </a>
+            </div>
         </div>
-        <div id="noResults" class="empty-state" style="text-align: center; margin-top: 40px; display: none;">
-            <p style="font-size: 1.2rem; color: var(--text-secondary); margin-bottom: 20px;">
-                📭 Nu am găsit evenimente care să corespundă criteriilor tale.
-            </p>
-            <p style="color: var(--text-secondary); margin-bottom: 20px;">
-                Încearcă să modifici filtrele sau creează un nouă eveniment!
-            </p>
-            <a href="create-event.html" class="btn btn-primary" style="text-decoration: none; display: inline-block; width: auto; padding: 12px 30px;">
-                ➕ Crează Eveniment Nou
-            </a>
+
+        <!-- Secțiunea Evenimente Organizate -->
+        <div id="tab-organized" class="tab-content" style="display: none;">
+            <div class="card">
+                <h2>📋 Evenimente Organizate de Tine</h2>
+                <div id="organizedEventsContainer" class="events-grid"></div>
+                <div id="noOrganizedEvents" class="empty-state" style="text-align: center; margin-top: 40px; display: none;">
+                    <p style="font-size: 1.2rem; color: var(--text-secondary); margin-bottom: 20px;">
+                        Nu ai organizat încă niciun eveniment.
+                    </p>
+                    <a href="create-event.html" class="btn btn-primary" style="text-decoration: none; display: inline-block; width: auto; padding: 12px 30px;">
+                        ➕ Crează Primul Eveniment
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Secțiunea Evenimente la Care Particip -->
+        <div id="tab-participating" class="tab-content" style="display: none;">
+            <div class="card">
+                <h2>✅ Evenimente la Care Participi</h2>
+                <div id="participatingEventsContainer" class="events-grid"></div>
+                <div id="noParticipatingEvents" class="empty-state" style="text-align: center; margin-top: 40px; display: none;">
+                    <p style="font-size: 1.2rem; color: var(--text-secondary); margin-bottom: 20px;">
+                        Nu participi încă la niciun eveniment.
+                    </p>
+                    <a href="#tab-all" class="tab-link btn btn-primary" style="text-decoration: none; display: inline-block; width: auto; padding: 12px 30px;">
+                        🔍 Explorează Evenimente
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Secțiunea Istoric -->
+        <div id="tab-history" class="tab-content" style="display: none;">
+            <div class="card">
+                <h2>📜 Istoric Evenimente</h2>
+                <div id="historyEventsContainer" class="events-grid"></div>
+                <div id="noHistoryEvents" class="empty-state" style="text-align: center; margin-top: 40px; display: none;">
+                    <p style="font-size: 1.2rem; color: var(--text-secondary); margin-bottom: 20px;">
+                        Nu ai istoric de evenimente încă.
+                    </p>
+                </div>
+            </div>
         </div>
     </div>
 
     <script src="../js/auth.js"></script>
+    <script src="../js/notifications.js"></script>
     <script src="../js/dashboard.js"></script>
 </body>
 </html>

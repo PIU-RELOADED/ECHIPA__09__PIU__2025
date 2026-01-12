@@ -11,10 +11,24 @@
     <nav class="navbar">
         <div class="nav-container">
             <h2 class="nav-logo">SportZone</h2>
-            <div>
-                <a href="dashboard.html" class="btn btn-secondary" style="text-decoration: none; margin-right: 10px;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <a href="dashboard.html" class="btn btn-secondary" style="text-decoration: none;">
                     ← Înapoi
                 </a>
+                <div style="position: relative;">
+                    <button id="notificationButton" onclick="toggleNotificationDropdown()" class="btn btn-secondary" style="position: relative; padding: 8px 12px;">
+                        🔔 Notificări
+                        <span id="notificationBadge" style="display: none; position: absolute; top: -5px; right: -5px; background: var(--danger-color); color: white; border-radius: 50%; width: 20px; height: 20px; font-size: 0.7rem; display: flex; align-items: center; justify-content: center; font-weight: bold;">0</span>
+                    </button>
+                    <div id="notificationDropdown" style="display: none; position: absolute; top: 100%; right: 0; margin-top: 10px; background: white; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); min-width: 300px; max-width: 400px; z-index: 1000; border: 1px solid var(--border-color);">
+                        <div style="padding: 15px; border-bottom: 1px solid var(--border-color); font-weight: 600;">
+                            Notificări
+                        </div>
+                        <div style="padding: 20px; text-align: center; color: var(--text-secondary);">
+                            <p>Se încarcă...</p>
+                        </div>
+                    </div>
+                </div>
                 <button onclick="logout()" class="btn btn-secondary">Logout</button>
             </div>
         </div>
@@ -29,6 +43,7 @@
     </div>
 
     <script src="../js/auth.js"></script>
+    <script src="../js/notifications.js"></script>
     <script src="../js/event-detail.js"></script>
 </body>
 </html>
