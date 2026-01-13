@@ -114,6 +114,30 @@ function validateEmail(email) {
     return re.test(email);
 }
 
+function validatePassword(password) {
+    if (password.length < 8) {
+        return false;
+    }
+    
+    if (/\s/.test(password)) {
+        return false;
+    }
+    
+    if (!/[A-Z]/.test(password)) {
+        return false;
+    }
+    
+    if (!/[0-9]/.test(password)) {
+        return false;
+    }
+    
+    if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) {
+        return false;
+    }
+    
+    return true;
+}
+
 function logout() {
     if (confirm("Ești sigur că vrei să te deloghezi?")) {
         localStorage.removeItem("isLoggedIn");
@@ -181,8 +205,8 @@ if (registerForm) {
             return;
         }
 
-        if (password.length < 3) {
-            errorElement.innerText = "Parola trebuie să aibă minimum 3 caractere";
+        if (!validatePassword(password)) {
+            errorElement.innerText = "Parola trebuie să aibă minim 8 caractere, cel puțin o literă mare, un număr, un caracter special și fără spații";
             errorElement.style.display = "block";
             return;
         }
